@@ -859,6 +859,34 @@ function addText() {
   updateSelectedTextControls();
   showStatus("文章を追加しました。");
 }
+function applyText() {
+  const text = getSelectedText();
+
+  if (!text) {
+    $("applyTextButton").disabled = true;
+    showStatus("編集する文章を選択してください。");
+    return;
+  }
+
+  const value = textInput.value.trim();
+
+  if (!value) {
+    showStatus("文章を入力してください。");
+    return;
+  }
+
+  if (value === text.text) {
+    showStatus("文章に変更はありません。");
+    return;
+  }
+
+  recordHistory();
+  text.text = value;
+  renderTextList();
+  renderPreview();
+  updateSelectedTextControls();
+  showStatus("文章を反映しました。");
+}
 function duplicateText(textId) {
   const layer = getSelectedLayer();
   if (!layer) return;
@@ -1241,6 +1269,7 @@ function selectText(textId, options = {}) {
   if (!text) return;
 
   selectedTextId = text.id;
+  $("applyTextButton").disabled = false;
   updateSelectedTextControls();
 
   // 通常の選択時だけ一覧を再描画する
@@ -1273,6 +1302,7 @@ function updateSelectedTextControls() {
   const text = getSelectedText();
   if (!text) {
     selectedTextName.textContent = "文章が選択されていません";
+    $("applyTextButton").disabled = true;
     return;
   }
   text.color = normalizeColor(text.color);
@@ -1991,6 +2021,7 @@ document.getElementById("previousLayerButton")
 document.getElementById("nextLayerButton")
   .addEventListener("click", () => navigateLayer(1));
 $("addTextButton").addEventListener("click", addText);
+$("applyTextButton").addEventListener("click", applyText);
 applyLayerTimeButton.addEventListener("click", applyLayerTime);
 applyPositionButton.addEventListener("click", applyPosition);
 deleteTextButton.addEventListener("click", deleteSelectedText);
