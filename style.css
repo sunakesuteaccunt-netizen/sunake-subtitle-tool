@@ -2012,3 +2012,47 @@ body {
     padding: 4px;
   }
 }
+/* ========================================
+   文章編集ボタンの配置調整
+======================================== */
+
+/* 文章編集欄のボタンを横並びにする */
+#textControls {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+/* 見出し */
+#textControls h3 {
+  margin: 0;
+}
+
+/* ボタン2つを横並びにする */
+#textControls .button-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: 100%;
+  margin: 0;
+}
+
+/* 2つのボタンの幅を均等にする */
+#textControls .button-row button {
+  flex: 1 1 0;
+  width: 50%;
+  min-width: 0;
+  margin: 0;
+  padding: 5px 4px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* 文章入力欄 */
+#textControls #textInput {
+  width: 100%;
+  min-width: 0;
+  grid-column: auto;
+  grid-row: auto;
+}
