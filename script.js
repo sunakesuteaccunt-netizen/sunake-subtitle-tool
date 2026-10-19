@@ -1277,6 +1277,7 @@ function updateSelectedTextControls() {
   }
   text.color = normalizeColor(text.color);
   selectedTextName.textContent = text.text;
+  textInput.value = text.text;
   positionX.value = text.x;
   positionY.value = text.y;
   fontSize.value = text.fontSize;
