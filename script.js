@@ -1306,6 +1306,9 @@ function updateSelectedTextControls() {
     $("applyTextButton").disabled = true;
     return;
   }
+
+  $("applyTextButton").disabled = false;
+
   text.color = normalizeColor(text.color);
   selectedTextName.textContent = text.text;
   textInput.value = text.text;
