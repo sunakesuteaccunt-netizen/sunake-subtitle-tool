@@ -2019,33 +2019,32 @@ body {
 /* 文章編集欄のボタンを横並びにする */
 #textControls {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: 6px 10px;
+  column-gap: 10px;
+  row-gap: 6px;
 }
 
-/* 見出し */
 #textControls h3 {
-  margin: 0;
   grid-column: 1;
   grid-row: 1;
+  margin: 0;
 }
 
-/* ボタン2つを横並びにする */
 #textControls .button-row {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-wrap: nowrap;
   gap: 6px;
   width: 100%;
+  min-width: 0;
   margin: 0;
-  grid-column: 2;
-  grid-row: 1;
 }
 
-/* 2つのボタンの幅を均等にする */
 #textControls .button-row button {
   flex: 1 1 0;
-  width: 50%;
+  width: auto;
   min-width: 0;
   margin: 0;
   padding: 5px 4px;
@@ -2053,10 +2052,12 @@ body {
   overflow-wrap: anywhere;
 }
 
-/* 文章入力欄 */
+#textControls label {
+  grid-column: 1 / -1;
+}
+
 #textControls #textInput {
+  grid-column: 1 / -1;
   width: 100%;
   min-width: 0;
-  grid-column: auto;
-  grid-row: auto;
 }
