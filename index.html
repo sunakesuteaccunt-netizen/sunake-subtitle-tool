@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>すなけ字幕変換ツール MK.IV</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <h1>すなけ字幕変換ツール MK.IV</h1>
+      <p>字幕を配置し、音声・動画に合わせて編集できます。</p>
+    </header>
+
+    <div class="workspace">
+
+      <!-- 左：ファイル操作とレイヤー一覧 -->
+      <aside class="left-panel">
+
+        <section id="mediaControls" class="compact-panel">
+          <h2>音声・動画</h2>
+
+          <label for="mediaFileInput">ファイルを選択</label>
+          <input
+            id="mediaFileInput"
+            type="file"
+            accept="audio/*,audio/mpeg,audio/mp3,.mp3,.m4a,.wav,.ogg,.aac,.flac,video/mp4,.mp4,video/webm,video/quicktime"
+          >
+
+          <p id="mediaFileName">音声・動画は読み込まれていません。</p>
+
+          <button id="clearMediaButton" type="button">
+            読み込み解除
+          </button>
+
+          <audio id="audioPlayer" controls hidden></audio>
+        </section>
+
+        <section id="exportControls" class="compact-panel">
+          <h2>字幕を書き出す</h2>
+
+          <label for="exportFileName">ファイル名</label>
+          <input
+            id="exportFileName"
+            type="text"
+            value="字幕"
+            maxlength="100"
+          >
+
+          <div class="button-row">
+            <button id="exportVttButton" type="button">VTT保存</button>
+            <button id="exportYttButton" type="button">YTT保存</button>
+          </div>
+        </section>
+
+        <section id="fileControls" class="compact-panel">
+          <h2>作品データ</h2>
+
+          <div class="button-row">
+            <button id="saveButton" type="button">作品を保存</button>
+            <button id="loadButton" type="button">作品を読み込む</button>
+          </div>
+
+          <input
+            id="fileInput"
+            type="file"
+            accept=".json,application/json"
+            hidden
+          >
+        </section>
+
+        <section id="layerControls" class="layer-panel">
+          <div class="panel-heading">
+            <h2>レイヤー一覧</h2>
+            <button id="addLayerButton" type="button">＋ 追加</button>
+          </div>
+
+          <p class="help-text">
+            レイヤーを選択して字幕を編集します。
+          </p>
+
+          <div id="layerList">
+            <p>まだレイヤーはありません。</p>
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- 右：プレビューと字幕編集 -->
+      <div class="right-panel">
+
+        <!-- 右上：プレビュー -->
+        <section id="editorControls" class="preview-panel">
+          <div class="panel-heading">
+            <h2>プレビュー</h2>
+            <p class="help-text">字幕をドラッグして位置を調整</p>
+          </div>
+
+          <div id="preview" aria-label="字幕の配置プレビュー">
+            <video id="videoPreview" playsinline hidden></video>
+            <p id="previewGuide">レイヤーを選択してください</p>
+          </div>
+
+          <div id="previewPlaybackBar">
+            <div class="playback-info">
+              <p id="playbackTime">0.0秒 / 0.0秒</p>
+
+              <div id="previewPlaybackButtons">
+                <button id="playButton" type="button" aria-label="再生">▶️</button>
+<button id="stopButton" type="button" aria-label="停止">⏹️</button>
+              </div>
+            </div>
+
+            <input
+              id="playbackProgress"
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value="0"
+              aria-label="再生位置"
+            >
+          </div>
+          <div id="layerNavigation" class="button-row">
+  <button id="previousLayerButton" type="button">
+    ← 前のレイヤー
+  </button>
+  <button id="nextLayerButton" type="button">
+    次のレイヤー →
+  </button>
+</div>
+        </section>
+
+        <!-- 右下：字幕の編集 -->
+        <section id="subtitleEditor" class="subtitle-editor">
+          <h2>字幕編集</h2>
+          <div id="historyControls" class="button-row">
+  <button id="undoButton" type="button" disabled>
+    ↶ 取り消し
+  </button>
+  <button id="redoButton" type="button" disabled>
+    ↷ やり直し
+  </button>
+</div>
+
+          <div class="editor-grid">
+
+            <section id="layerTimeControls" class="editor-card">
+              <h3>表示時間</h3>
+              <p id="selectedLayerName">
+                レイヤーが選択されていません
+              </p>
+
+              <div class="field-grid">
+                <div>
+                  <label for="startTime">開始（秒）</label>
+                  <input
+                    id="startTime"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value="0"
+                  >
+                </div>
+
+                <div>
+                  <label for="endTime">終了（秒）</label>
+                  <input
+                    id="endTime"
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    value="2"
+                  >
+                </div>
+              </div>
+
+              <button id="applyLayerTimeButton" type="button">
+                表示時間を反映
+              </button>
+            </section>
+
+            <section id="textControls" class="editor-card">
+              <h3>文章を追加</h3>
+
+              <label for="textInput">表示する文章</label>
+              <textarea
+                id="textInput"
+                rows="2"
+                placeholder="ここに文章を入力"
+              ></textarea>
+
+              <button id="addTextButton" type="button">
+                ＋ 文章を追加
+              </button>
+            </section>
+
+            <section id="selectedTextControls" class="editor-card">
+              <h3>文章の位置</h3>
+              <p id="selectedTextName">文章が選択されていません</p>
+
+              <div class="field-grid">
+                <div>
+                  <label for="positionX">横位置（％）</label>
+                  <input
+                    id="positionX"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value="50"
+                  >
+                </div>
+
+                <div>
+                  <label for="positionY">縦位置（％）</label>
+                  <input
+                    id="positionY"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value="50"
+                  >
+                </div>
+              </div>
+
+              <div class="button-row">
+                <button id="applyPositionButton" type="button">
+                  位置を反映
+                </button>
+                <button id="deleteTextButton" type="button">
+                  文章を削除
+                </button>
+              </div>
+            </section>
+
+            <section id="sizeControls" class="editor-card">
+              <h3>文字のスタイル</h3>
+
+              <label for="fontSize">文字サイズ（％）</label>
+              <input
+                id="fontSize"
+                type="number"
+                min="25"
+                max="300"
+                step="5"
+                value="100"
+              >
+
+              <label for="fontColor">文字色</label>
+              <div class="color-row">
+                <input id="fontColor" type="color" value="#ffffff">
+                <span id="fontColorValue">#FFFFFF</span>
+              </div>
+
+              <button id="applyFontSizeButton" type="button">
+                サイズ・色を反映
+              </button>
+            </section>
+
+            <section id="textListControls" class="editor-card text-list-card">
+              <h3>このレイヤーの文章一覧</h3>
+              <div id="textList">
+                <p>レイヤーを選択してください。</p>
+              </div>
+            </section>
+
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <p id="status" role="status">準備中...</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,2014 @@
+
+/* ========================================
+   すなけ字幕変換ツール MK.IV
+   レイアウト安定化・横向き優先版
+======================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    "Noto Sans JP", sans-serif;
+  color: #252a34;
+  background: #edf0f5;
+  line-height: 1.45;
+}
+
+html {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 10px;
+  background: #edf0f5;
+  color: #252a34;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  min-height: 38px;
+  padding: 7px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: #3268d8;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+button:disabled {
+  background: #aeb7c6;
+  cursor: not-allowed;
+}
+
+input,
+textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #b9c2d0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #252a34;
+}
+
+input[type="file"] {
+  height: auto;
+  padding: 7px;
+  font-size: 0.82rem;
+}
+
+input[type="color"] {
+  width: 54px;
+  height: 38px;
+  padding: 3px;
+}
+
+input[type="range"] {
+  padding: 0;
+  accent-color: #3268d8;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+input:focus,
+textarea:focus {
+  outline: 2px solid #6b9cff;
+  outline-offset: 1px;
+}
+
+textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+
+label {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.3;
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 1.02rem;
+}
+
+h3 {
+  margin: 0 0 8px;
+  font-size: 0.94rem;
+}
+
+p {
+  margin: 5px 0 8px;
+}
+
+.help-text {
+  color: #687386;
+  font-size: 0.8rem;
+}
+
+/* ========================================
+   アプリ全体
+======================================== */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 1800px;
+  min-height: calc(100vh - 20px);
+  margin: 0 auto;
+}
+
+.app-header {
+  flex: 0 0 auto;
+}
+
+.app-header p {
+  margin: 3px 0 0;
+  color: #687386;
+  font-size: 0.84rem;
+}
+
+/* ========================================
+   横向き：左1列＋右上下2領域
+======================================== */
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.8fr);
+  gap: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.left-panel,
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.left-panel {
+  min-height: 500px;
+}
+
+.right-panel {
+  min-height: 650px;
+}
+
+/* パネルの共通設定 */
+section {
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #dce1e9;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(20, 30, 50, 0.05);
+}
+
+/* ========================================
+   左：読み込み・書き出し・作品データ
+======================================== */
+
+.compact-panel {
+  flex: 0 0 auto;
+}
+
+.compact-panel h2 {
+  margin-bottom: 6px;
+}
+
+.compact-panel p {
+  font-size: 0.82rem;
+}
+
+.compact-panel button {
+  min-height: 36px;
+  padding: 6px 9px;
+  font-size: 0.82rem;
+}
+
+#mediaFileName {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+#clearMediaButton,
+#stopButton {
+  background: #555e6e;
+}
+
+#deleteTextButton {
+  background: #c74343;
+}
+
+#audioPlayer {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+}
+
+#audioPlayer[hidden] {
+  display: none;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.button-row button {
+  flex: 1 1 100px;
+  min-width: 0;
+  margin: 0;
+}
+
+/* ========================================
+   左：レイヤー一覧
+======================================== */
+
+#layerControls {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 220px;
+  overflow: hidden;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.panel-heading h2 {
+  min-width: 0;
+  margin: 0;
+}
+
+.panel-heading button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  margin: 0;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+#layerControls > .help-text {
+  flex: 0 0 auto;
+  margin: 7px 0;
+}
+
+#layerList {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  min-height: 0;
+  margin-top: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* JavaScriptで作成されるレイヤー項目 */
+.layer-list-item {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #dce1e9;
+  border-radius: 9px;
+  background: #f8faff;
+  color: #252a34;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.layer-list-item.selected {
+  border: 2px solid #3268d8;
+  background: #eaf1ff;
+}
+
+.layer-list-item button {
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 34px;
+  margin: 0;
+  padding: 6px 9px;
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+/* レイヤー項目の文字が長い場合も表示を崩しにくくする */
+#layerList > * {
+  max-width: 100%;
+}
+
+/* ========================================
+   右上：プレビュー
+======================================== */
+
+#editorControls {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+}
+
+#editorControls > .panel-heading {
+  flex: 0 0 auto;
+}
+
+#editorControls .help-text {
+  margin: 0;
+  text-align: right;
+}
+
+#preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 180px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 2px solid #9ca8b9;
+  border-radius: 7px;
+  background: #20242c;
+  isolation: isolate;
+}
+
+#videoPreview {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #20242c;
+}
+
+#videoPreview[hidden] {
+  display: none;
+}
+
+#previewGuide {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  margin: 0;
+  color: #c4cbd6;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.draggable-text {
+  position: absolute;
+  z-index: 2;
+  max-width: 95%;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-shadow:
+    -1px -1px 2px #000000,
+     1px -1px 2px #000000,
+    -1px  1px 2px #000000,
+     1px  1px 2px #000000;
+  transform: translate(-50%, -50%);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.draggable-text.selected {
+  outline: 2px dashed #72a5ff;
+  outline-offset: 4px;
+}
+
+.draggable-text:active {
+  cursor: grabbing;
+}
+
+/* ========================================
+   プレビュー直下：再生操作
+======================================== */
+
+#previewPlaybackBar {
+  flex: 0 0 auto;
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid #dce1e9;
+  border-radius: 8px;
+  background: #f8faff;
+}
+
+.playback-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#playbackTime {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+#previewPlaybackButtons {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+#previewPlaybackButtons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-height: 36px;
+  margin: 0;
+  padding: 4px;
+  font-size: 1.05rem;
+}
+
+#playbackProgress {
+  display: block;
+  width: 100%;
+  height: 22px;
+  margin: 4px 0 0;
+}
+
+/* ========================================
+   右下：字幕編集
+======================================== */
+
+#subtitleEditor {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 300px;
+  overflow: hidden;
+}
+
+#subtitleEditor > h2 {
+  flex: 0 0 auto;
+  margin-bottom: 8px;
+}
+
+/*
+  カードの高さを固定しない。
+  入力欄がはみ出すのを防ぎ、
+  必要に応じて編集領域内をスクロールする。
+*/
+.editor-grid {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: max-content;
+  align-content: start;
+  align-items: start;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.editor-card {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #e0e5ed;
+  border-radius: 8px;
+  background: #fbfcff;
+  overflow: visible;
+}
+
+.editor-card h3 {
+  margin-bottom: 7px;
+}
+
+.editor-card p {
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.editor-card label {
+  margin-top: 8px;
+  font-size: 0.82rem;
+}
+
+.editor-card input,
+.editor-card textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.editor-card button {
+  max-width: 100%;
+  min-height: 36px;
+  padding: 6px 9px;
+  font-size: 0.82rem;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.field-grid > div {
+  min-width: 0;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 38px;
+}
+
+#fontColorValue {
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+#textListControls {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+#textList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin-top: 7px;
+}
+
+.text-list-item {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #dce1e9;
+  border-radius: 7px;
+  background: #f8faff;
+  color: #252a34;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.text-list-item.selected {
+  border: 2px solid #3268d8;
+  background: #eaf1ff;
+}
+
+/* ========================================
+   状態メッセージ
+======================================== */
+
+#status {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #dce1e9;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+/* ========================================
+   横向き・低い画面
+======================================== */
+
+@media (orientation: landscape) and (min-width: 760px) {
+  body {
+    overflow: hidden;
+  }
+
+  .app {
+    height: calc(100vh - 20px);
+    min-height: 0;
+  }
+
+  .workspace {
+    min-height: 0;
+  }
+
+  .left-panel {
+    min-height: 0;
+  }
+
+  .right-panel {
+    min-height: 0;
+  }
+
+  #layerControls {
+    min-height: 0;
+  }
+
+  #editorControls {
+    flex: 0 1 auto;
+  }
+
+  #subtitleEditor {
+    flex: 1 1 0;
+  }
+}
+
+@media (orientation: landscape) and (min-width: 760px) and (max-height: 760px) {
+  body {
+    padding: 6px;
+  }
+
+  .app {
+    height: calc(100vh - 12px);
+    gap: 5px;
+  }
+
+  .workspace {
+    gap: 6px;
+  }
+
+  .left-panel,
+  .right-panel {
+    gap: 6px;
+  }
+
+  section {
+    padding: 8px;
+  }
+
+  .app-header h1 {
+    font-size: 1.15rem;
+  }
+
+  .app-header p {
+    display: none;
+  }
+
+  #preview {
+    min-height: 120px;
+  }
+
+  #layerControls {
+    min-height: 0;
+  }
+
+  .editor-card {
+    padding: 8px;
+  }
+
+  #status {
+    padding: 5px 8px;
+  }
+}
+
+/* ========================================
+   縦向き・狭い画面
+======================================== */
+
+@media (max-width: 759px), (orientation: portrait) {
+  body {
+    min-height: 100vh;
+    padding: 8px;
+    overflow: auto;
+  }
+
+  .app {
+    height: auto;
+    min-height: calc(100vh - 16px);
+  }
+
+  .workspace {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .left-panel,
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  #layerControls {
+    min-height: 240px;
+  }
+
+  #editorControls {
+    min-height: 0;
+  }
+
+  #preview {
+    min-height: 180px;
+  }
+
+  #subtitleEditor {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .editor-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: max-content;
+    overflow: visible;
+  }
+
+  #textListControls {
+    grid-column: auto;
+  }
+
+  .layer-list-item {
+    flex-wrap: wrap;
+  }
+}
+
+/* 小さなスマートフォン */
+@media (max-width: 420px) {
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  section {
+    padding: 9px;
+  }
+
+  .editor-card {
+    padding: 8px;
+  }
+
+  .field-grid {
+    gap: 6px;
+  }
+
+  #previewPlaybackButtons button {
+    width: 36px;
+  }
+}
+
+/* ========================================
+   横向きレイアウトの追加調整
+======================================== */
+
+@media (orientation: landscape) and (min-width: 760px) {
+
+  /* 右側のプレビューに広い幅を確保 */
+  .workspace {
+    grid-template-columns:
+      minmax(245px, 0.68fr)
+      minmax(0, 2fr);
+    gap: 8px;
+  }
+
+  /* 左側はレイヤー一覧を優先 */
+  .left-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto minmax(180px, 1fr);
+    align-content: stretch;
+    gap: 6px;
+    min-height: 0;
+  }
+
+  /* 上部の操作パネルの余白を縮小 */
+  #mediaControls,
+  #exportControls,
+  #fileControls {
+    padding: 6px 8px;
+    min-width: 0;
+  }
+
+  #mediaControls h2,
+  #exportControls h2,
+  #fileControls h2 {
+    margin-bottom: 4px;
+    font-size: 0.88rem;
+  }
+
+  #mediaControls label,
+  #exportControls label {
+    margin: 3px 0;
+    font-size: 0.76rem;
+  }
+
+  #mediaControls input[type="file"],
+  #exportControls input[type="text"] {
+    min-height: 30px;
+    padding: 4px 6px;
+    font-size: 0.75rem;
+  }
+
+  #mediaControls p {
+    margin: 3px 0;
+    font-size: 0.72rem;
+  }
+
+  #mediaControls button,
+  #exportControls button,
+  #fileControls button {
+    min-height: 30px;
+    padding: 4px 6px;
+    font-size: 0.74rem;
+  }
+
+  /* ファイル選択と解除ボタンを横並びにする */
+  #mediaControls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 6px;
+  }
+
+  #mediaControls h2,
+  #mediaControls label,
+  #mediaControls input[type="file"],
+  #mediaControls #mediaFileName,
+  #mediaControls #audioPlayer {
+    grid-column: 1 / -1;
+  }
+
+  #mediaControls #clearMediaButton {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  /* VTT・YTTのボタンは必ず同じ行に */
+  #exportControls .button-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+  }
+
+  #exportControls .button-row button {
+    flex: 1 1 0;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  /* 作品保存・読み込みも同じ行に */
+  #fileControls .button-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+  }
+
+  #fileControls .button-row button {
+    flex: 1 1 0;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  /* レイヤー一覧がつぶれないようにする */
+  #layerControls {
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #layerList {
+    flex: 1 1 auto;
+    min-height: 80px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* レイヤー名とボタンを読みやすくする */
+  .layer-list-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 7px;
+  }
+
+  .layer-list-item button {
+    flex: 0 0 auto;
+    min-height: 30px;
+    padding: 4px 7px;
+    font-size: 0.75rem;
+  }
+
+  /* 右側のプレビューは横幅を優先 */
+  .right-panel {
+    min-width: 0;
+  }
+
+  #editorControls {
+    min-width: 0;
+  }
+
+  #preview {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+
+  /* 編集パネルのスクロールは維持 */
+  #subtitleEditor {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .editor-grid {
+    min-width: 0;
+    overflow-y: auto;
+  }
+}
+
+/* 画面の高さが特に低い場合 */
+@media (orientation: landscape) and (min-width: 760px)
+  and (max-height: 600px) {
+
+  .app {
+    height: calc(100vh - 12px);
+    gap: 4px;
+  }
+
+  .workspace {
+    gap: 5px;
+  }
+
+  .left-panel,
+  .right-panel {
+    gap: 4px;
+  }
+
+  #mediaControls,
+  #exportControls,
+  #fileControls {
+    padding: 4px 6px;
+  }
+
+  #mediaControls p {
+    display: none;
+  }
+
+  #layerControls {
+    min-height: 140px;
+  }
+
+  #layerList {
+    min-height: 60px;
+  }
+}
+
+/* =========================================
+   MK.IV 最終レイアウト調整
+   横向き：余白削減・ページスクロール対応
+========================================= */
+
+/* 全体の余白を削減 */
+body {
+  padding: 5px;
+}
+
+.app {
+  width: 100%;
+  max-width: none;
+  gap: 5px;
+}
+
+/* 横向きでもページ全体をスクロール可能にする */
+@media (orientation: landscape) and (min-width: 760px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .app {
+    height: auto;
+    min-height: calc(100vh - 10px);
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.72fr) minmax(0, 2fr);
+    align-items: stretch;
+    gap: 6px;
+    min-height: 0;
+  }
+
+  .left-panel,
+  .right-panel {
+    min-width: 0;
+    min-height: 0;
+    gap: 6px;
+  }
+
+  /* 左側の各パネルをコンパクトに */
+  .left-panel section {
+    padding: 7px;
+    border-radius: 8px;
+  }
+
+  .left-panel h2 {
+    margin-bottom: 4px;
+    font-size: 0.86rem;
+  }
+
+  .left-panel p,
+  .left-panel .help-text {
+    margin: 3px 0;
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
+  .left-panel label {
+    margin: 3px 0;
+    font-size: 0.75rem;
+  }
+
+  .left-panel input {
+    min-height: 30px;
+    padding: 4px 6px;
+    font-size: 0.76rem;
+  }
+
+  .left-panel input[type="file"] {
+    padding: 3px;
+    font-size: 0.7rem;
+  }
+
+  .left-panel button {
+    min-height: 30px;
+    margin-top: 3px;
+    margin-right: 0;
+    padding: 4px 7px;
+    font-size: 0.72rem;
+  }
+
+  /* 操作欄内の余計な隙間を削る */
+  .left-panel .button-row {
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  /* レイヤー一覧に残りの高さを使わせる */
+  #layerControls {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 180px;
+    height: auto;
+    overflow: hidden;
+  }
+
+  #layerList {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .layer-list-item {
+    gap: 5px;
+    padding: 6px;
+    font-size: 0.76rem;
+  }
+
+  .layer-list-item button {
+    min-height: 28px;
+    padding: 3px 6px;
+    font-size: 0.7rem;
+  }
+
+  /* 右側はプレビューを大きく維持 */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #editorControls {
+    flex: 0 0 auto;
+    gap: 5px;
+    padding: 8px;
+  }
+
+  #editorControls h2 {
+    margin-bottom: 3px;
+  }
+
+  #editorControls .help-text {
+    font-size: 0.7rem;
+  }
+
+  #preview {
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    margin: 0;
+  }
+
+  /* 再生操作の余白を削る */
+  #previewPlaybackBar {
+    padding: 5px 7px;
+    margin-top: 0;
+  }
+
+  #playbackProgress {
+    height: 20px;
+    margin-top: 2px;
+  }
+
+  #previewPlaybackButtons button {
+    width: 34px;
+    min-height: 30px;
+    padding: 2px;
+  }
+
+  /* 字幕編集は既存のスクロールを維持 */
+  #subtitleEditor {
+    flex: 0 0 auto;
+    min-height: 300px;
+    overflow: visible;
+  }
+
+  .editor-grid {
+    min-height: 0;
+    overflow-y: visible;
+  }
+
+  .editor-card {
+    padding: 7px;
+  }
+
+  .editor-card h3 {
+    margin-bottom: 4px;
+    font-size: 0.82rem;
+  }
+
+  .editor-card p,
+  .editor-card label {
+    font-size: 0.74rem;
+  }
+
+  /* ステータス表示もコンパクトに */
+  #status {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+}
+
+/* 横向きで画面の高さが低い場合 */
+@media (orientation: landscape) and (min-width: 760px)
+  and (max-height: 600px) {
+
+  .workspace {
+    grid-template-columns: minmax(220px, 0.68fr) minmax(0, 2fr);
+  }
+
+  .left-panel section {
+    padding: 5px;
+  }
+
+  #mediaControls p,
+  #exportControls p,
+  #fileControls p {
+    display: none;
+  }
+
+  #layerControls {
+    min-height: 150px;
+  }
+
+  #layerList {
+    min-height: 80px;
+  }
+
+  #preview {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* 縦向きのレイアウトはこれまでの状態を維持 */
+@media (max-width: 759px), (orientation: portrait) {
+  body {
+    padding: 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .app {
+    height: auto;
+  }
+
+  .workspace {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .left-panel,
+  .right-panel {
+    min-height: 0;
+  }
+
+  #subtitleEditor {
+    min-height: 0;
+  }
+
+  .editor-grid {
+    overflow: visible;
+  }
+}
+
+/* ========================================
+   MK.IV コンパクト化 第1段階
+   iPad横向き・PC優先／既存機能は維持
+   ======================================== */
+
+/* 全体の余白を縮小 */
+body {
+  padding: 6px;
+  overflow-x: hidden;
+}
+
+.app {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.app > h1 {
+  margin: 3px 0 6px;
+  font-size: 1.15rem;
+}
+
+.app > p {
+  margin: 3px 0 6px;
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+/* 各パネルの余白・隙間を縮小 */
+.app section {
+  margin: 5px 0;
+  padding: 7px;
+  border-radius: 8px;
+}
+
+.app h2 {
+  margin: 2px 0 5px;
+  font-size: 0.92rem;
+}
+
+.app h3 {
+  margin: 2px 0 4px;
+  font-size: 0.82rem;
+}
+
+.app section p {
+  margin: 3px 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.app label {
+  margin: 2px 0;
+  font-size: 0.78rem;
+}
+
+/* ボタンの高さ・左右の余白を縮小 */
+.app button {
+  min-height: 32px;
+  margin-top: 3px;
+  margin-right: 3px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.app input,
+.app select,
+.app textarea {
+  padding: 4px 6px;
+  font-size: 0.8rem;
+}
+
+.app input:not([type="range"]):not([type="checkbox"]):not([type="radio"]) {
+  min-height: 30px;
+}
+
+.app input[type="range"] {
+  margin: 3px 0;
+}
+
+/* 数値欄をコンパクトに */
+#fontSize,
+#positionX,
+#positionY,
+#startTime,
+#endTime {
+  width: 5.5rem;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 数値入力欄のラベル内にある余分な空白を減らす */
+#sizeControls label,
+#selectedTextControls label,
+#layerTimeControls label {
+  gap: 5px;
+}
+
+/* 字幕プレビューは横幅を活用 */
+#preview {
+  width: 100%;
+  margin: 3px 0;
+}
+
+/* 再生バー周辺の余白を縮小 */
+#previewPlaybackBar {
+  margin-top: 3px;
+  padding: 4px 6px;
+}
+
+#playbackTime {
+  margin: 0 0 3px;
+  font-size: 0.75rem;
+}
+
+#playbackProgress {
+  margin: 2px 0;
+}
+
+/* レイヤー一覧を詰める */
+#layerList {
+  gap: 4px;
+}
+
+.layer-list-item {
+  gap: 4px;
+  padding: 5px;
+  font-size: 0.78rem;
+}
+
+.layer-list-item button {
+  min-height: 28px;
+  padding: 3px 6px;
+  font-size: 0.72rem;
+}
+
+/* 状態表示も省スペースに */
+#status {
+  margin: 4px 0;
+  padding: 4px 6px;
+  font-size: 0.75rem;
+}
+
+/* iPad横向き・PC */
+@media (orientation: landscape) and (min-width: 760px) {
+  .workspace {
+    gap: 6px;
+    grid-template-columns: minmax(230px, 0.75fr) minmax(0, 2fr);
+  }
+
+  .left-panel,
+  .right-panel {
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .left-panel section {
+    padding: 6px;
+  }
+
+  .left-panel button {
+    min-height: 29px;
+    padding: 3px 6px;
+    font-size: 0.72rem;
+  }
+
+  .left-panel input:not([type="range"]):not([type="checkbox"]):not([type="radio"]) {
+    min-height: 27px;
+  }
+
+  #editorControls {
+    padding: 6px;
+  }
+
+  #subtitleEditor {
+    min-height: 0;
+  }
+
+  .editor-grid {
+    gap: 5px;
+  }
+
+  .editor-card {
+    padding: 6px;
+  }
+}
+
+/* 縦向きでは操作しやすさを優先 */
+@media (max-width: 759px), (orientation: portrait) {
+  .app {
+    width: 100%;
+  }
+
+  .app section {
+    padding: 7px;
+  }
+
+  #fontSize,
+  #positionX,
+  #positionY,
+  #startTime,
+  #endTime {
+    width: 6rem;
+  }
+}
+.text-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+.text-list-item.dragging {
+  opacity: 0.5;
+}
+/* 字幕の文章一覧をスクロール可能にする */
+#textList {
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 字幕の並べ替えを分かりやすくする */
+.text-list-item {
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* ドラッグ中の字幕 */
+.text-list-item.dragging {
+  opacity: 0.65;
+  background-color: rgba(100, 160, 255, 0.18);
+  box-shadow: 0 0 0 2px rgba(100, 160, 255, 0.7);
+  border-radius: 6px;
+}
+
+/* ドラッグ用の目印 */
+.text-drag-handle {
+  transition: color 0.15s ease;
+}
+
+.text-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* ドラッグ中は選択状態に関係なく強調する */
+.text-list-item.dragging,
+.text-list-item.dragging.selected {
+  opacity: 0.65 !important;
+  background-color: rgba(100, 160, 255, 0.22) !important;
+  box-shadow: 0 0 0 2px rgba(100, 160, 255, 0.8) !important;
+  border-radius: 6px;
+}
+
+/* 字幕一覧の並べ替えアニメーション */
+.text-list-item {
+  will-change: transform;
+}
+
+/* ドラッグ中の字幕はアニメーションさせず、操作に追従させる */
+.text-list-item.dragging {
+  transition: none !important;
+}
+/* 字幕一覧を1行表示に統一 */
+.text-list-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* 字幕のテキスト欄を1行に固定 */
+.text-list-item button {
+  min-width: 0;
+}
+
+.text-list-item button:first-of-type {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 字幕一覧のドラッグ操作 */
+#textList {
+  position: relative;
+}
+
+.text-list-item {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+  will-change: transform;
+}
+
+/* ドラッグしている字幕を前面に表示 */
+.text-list-item.dragging {
+  z-index: 10;
+  opacity: 0.95;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  transition: none !important;
+}
+
+/* ドラッグハンドルだけ操作可能にする */
+.text-drag-handle {
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+
+/* ========================================
+   レイヤー一覧のスクロール改善
+======================================== */
+
+/* レイヤーパネルの高さを制限し、内部をはみ出させない */
+#layerControls {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* レイヤー一覧だけをスクロールさせる */
+#layerList {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* レイヤー項目が縮んで押しつぶされないようにする */
+#layerList > .layer-list-item {
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+/* レイヤー一覧のドラッグ用持ち手 */
+.layer-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+
+.layer-list-item {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.layer-list-item.dragging {
+  z-index: 10;
+  opacity: 0.95;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  transition: none !important;
+}
+
+/* ========================================
+   MK.IV 字幕編集欄コンパクト化 第1段階
+   既存機能・操作を維持して余白を削減
+======================================== */
+
+@media (orientation: landscape) and (min-width: 760px) {
+
+  /* 字幕編集パネル全体 */
+  #subtitleEditor {
+    padding: 6px;
+    gap: 4px;
+    min-height: 0;
+  }
+
+  #subtitleEditor > h2 {
+    margin: 0 0 3px;
+    line-height: 1.2;
+  }
+
+  /* 4つの編集カードの間隔 */
+  .editor-grid {
+    gap: 4px;
+    align-content: start;
+    grid-auto-rows: max-content;
+  }
+
+  /* カード内部の余白 */
+  .editor-card {
+    padding: 5px;
+    border-radius: 6px;
+  }
+
+  /* 見出しと説明文 */
+  .editor-card h3 {
+    margin: 0 0 3px;
+    line-height: 1.2;
+  }
+
+  .editor-card p {
+    margin: 2px 0;
+    line-height: 1.2;
+  }
+
+  /* ラベルと入力欄の間隔 */
+  .editor-card label {
+    margin: 3px 0 2px;
+    line-height: 1.2;
+  }
+
+  .editor-card input,
+  .editor-card textarea {
+    min-height: 28px;
+    padding: 3px 6px;
+  }
+
+  /* 文章入力欄だけ高さを抑える */
+  .editor-card textarea {
+    height: 48px;
+    min-height: 48px;
+    resize: vertical;
+  }
+
+  /* ボタンの高さ・余白 */
+  .editor-card button {
+    min-height: 28px;
+    margin-top: 2px;
+    padding: 4px 7px;
+    line-height: 1.15;
+  }
+
+  /* 開始・終了、横・縦の入力欄の間隔 */
+  .field-grid {
+    gap: 5px;
+  }
+
+  /* 色選択欄の高さ */
+  .color-row {
+    min-height: 28px;
+    gap: 5px;
+  }
+
+  input[type="color"] {
+    height: 28px;
+  }
+
+  /* 字幕一覧の上側の余白 */
+  #textList {
+    margin-top: 4px;
+    gap: 4px;
+  }
+
+  .text-list-item {
+    padding: 5px;
+  }
+}
+
+/* ========================================
+   MK.IV 字幕編集欄コンパクト化 第2段階
+   見出し・ボタンを横並びにする
+======================================== */
+
+@media (orientation: landscape) and (min-width: 760px) {
+
+  /* 編集欄全体とカード間の余白 */
+  #subtitleEditor {
+    padding: 6px;
+    min-height: 0;
+  }
+
+  #subtitleEditor > h2 {
+    margin: 0 0 3px;
+  }
+
+  #historyControls {
+    gap: 5px;
+    margin: 0 0 4px;
+  }
+
+  #historyControls button {
+    min-height: 28px;
+    margin: 0;
+    padding: 3px 7px;
+  }
+
+  .editor-grid {
+    gap: 4px;
+    align-content: start;
+    grid-auto-rows: max-content;
+    overflow-y: auto;
+  }
+
+  /* 4つのカード共通 */
+  .editor-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-content: start;
+    align-items: center;
+    gap: 3px 6px;
+    min-width: 0;
+    padding: 5px;
+  }
+
+  .editor-card h3 {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.2;
+  }
+
+  .editor-card p {
+    display: none;
+  }
+
+  .editor-card label {
+    margin: 0;
+    font-size: 0.74rem;
+    line-height: 1.2;
+  }
+
+  .editor-card input,
+  .editor-card textarea {
+    min-width: 0;
+    min-height: 27px;
+    padding: 3px 5px;
+    font-size: 0.8rem;
+  }
+
+  .editor-card button {
+    min-height: 28px;
+    margin: 0;
+    padding: 4px 6px;
+    font-size: 0.72rem;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .editor-card .field-grid {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    gap: 5px;
+  }
+
+  .editor-card .field-grid > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  /* 表示時間：見出しと反映ボタンを1行目に */
+  #layerTimeControls {
+    grid-template-rows: auto auto;
+  }
+
+  #layerTimeControls #applyLayerTimeButton {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    max-width: 100%;
+  }
+
+  #layerTimeControls .field-grid {
+    grid-row: 2;
+  }
+
+  /* 文章の追加：見出しと追加ボタンを1行目に */
+  #textControls {
+    grid-template-rows: auto auto;
+  }
+
+  #textControls h3 {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #textControls label {
+    display: none;
+  }
+
+  #textControls #addTextButton {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    max-width: 100%;
+  }
+
+  #textControls #textInput {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    height: 48px;
+    min-height: 48px;
+    resize: vertical;
+  }
+
+  /* 文章の位置：操作ボタン2つを見出しの右側に */
+  #selectedTextControls {
+    grid-template-rows: auto auto;
+  }
+
+  #selectedTextControls h3 {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #selectedTextControls .button-row {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 4px;
+    min-width: 0;
+    margin: 0;
+  }
+
+  #selectedTextControls .button-row button {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  #selectedTextControls .field-grid {
+    grid-row: 2;
+  }
+
+  /* 文字のスタイル：見出しと反映ボタンを1行目に */
+  #sizeControls {
+    grid-template-rows: auto auto auto;
+  }
+
+  #sizeControls h3 {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #sizeControls #applyFontSizeButton {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    max-width: 100%;
+  }
+
+  #sizeControls label[for="fontSize"] {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  #sizeControls #fontSize {
+    grid-column: 1;
+    grid-row: 3;
+    width: 100%;
+  }
+
+  #sizeControls label[for="fontColor"] {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  #sizeControls .color-row {
+    grid-column: 2;
+    grid-row: 3;
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+    min-height: 27px;
+  }
+
+  #sizeControls #fontColor {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 27px;
+    min-height: 27px;
+    padding: 2px;
+  }
+
+  #sizeControls #fontColorValue {
+    min-width: 0;
+    font-size: 0.72rem;
+    overflow-wrap: anywhere;
+  }
+
+  /* 文章一覧はカード全幅を使う */
+  #textListControls {
+    grid-column: 1 / -1;
+    display: block;
+  }
+
+  #textListControls h3 {
+    margin-bottom: 3px;
+  }
+
+  #textList {
+    margin-top: 3px;
+    gap: 3px;
+  }
+
+  #textList .text-list-item {
+    padding: 4px;
+  }
+}
