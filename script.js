@@ -850,6 +850,7 @@ function addText() {
     showStatus("文章を入力してください。");
     return;
   }
+
   const text = createText(value);
   layer.texts.push(text);
   selectedTextId = text.id;
