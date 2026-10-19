@@ -277,5 +277,12 @@
 
     <p id="status" role="status">準備中...</p>
   </main>
+  <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js");
+    });
+  }
+</script>
 </body>
 </html>
