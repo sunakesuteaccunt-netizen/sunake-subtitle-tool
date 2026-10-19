@@ -184,18 +184,23 @@
             </section>
 
             <section id="textControls" class="editor-card">
-              <h3>文章を編集</h3>
+             <h3>文章を編集</h3>
 
-              <label for="textInput">編集する文章</label>
-              <textarea
-                id="textInput"
-                rows="2"
-                placeholder="選択した字幕の文章を編集"
-              ></textarea>
+            <div class="button-row">
+              <button id="applyTextButton" type="button" disabled>
+                 文章を反映
+               </button>
+               <button id="addTextButton" type="button">
+                 ＋ 文章を追加
+               </button>
+             </div>
 
-              <button id="addTextButton" type="button">
-               ＋ 文章を追加
-              </button>
+             <label for="textInput">編集する文章</label>
+             <textarea
+               id="textInput"
+               rows="2"
+               placeholder="選択した字幕の文章を編集"
+             ></textarea>
             </section>
 
             <section id="selectedTextControls" class="editor-card">
