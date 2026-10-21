@@ -2060,3 +2060,65 @@ body {
   width: 100%;
   min-width: 0;
 }
+
+/* ========================================
+   MK.IV 数値入力欄の矢印ボタン
+   表示時間・文章の位置
+======================================== */
+
+.number-input-with-arrows {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+}
+
+.number-input-with-arrows input[type="number"] {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+}
+
+.number-arrow-buttons {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 0;
+}
+
+.number-arrow-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  min-width: 0;
+  min-height: 30px;
+  margin: 0;
+  padding: 2px;
+  font-size: 0.68rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* 縦向きや狭い画面でも入力欄をはみ出させない */
+@media (max-width: 759px), (orientation: portrait) {
+  .number-input-with-arrows {
+    gap: 2px;
+  }
+
+  .number-arrow-buttons {
+    gap: 2px;
+  }
+
+  .number-arrow-buttons button {
+    flex-basis: 26px;
+    width: 26px;
+    min-height: 30px;
+    padding: 2px;
+  }
+}
