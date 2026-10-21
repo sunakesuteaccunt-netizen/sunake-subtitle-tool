@@ -2016,24 +2016,19 @@ body {
    文章編集ボタンの配置調整
 ======================================== */
 
-/* 文章編集欄のボタンを横並びにする */
 #textControls {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  column-gap: 10px;
-  row-gap: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
 }
 
 #textControls h3 {
-  grid-column: 1;
-  grid-row: 1;
   margin: 0;
 }
 
+/* 2つのボタンを横並びにする */
 #textControls .button-row {
-  grid-column: 2;
-  grid-row: 1;
   display: flex;
   flex-wrap: nowrap;
   gap: 6px;
@@ -2044,7 +2039,7 @@ body {
 
 #textControls .button-row button {
   flex: 1 1 0;
-  width: auto;
+  width: 50%;
   min-width: 0;
   margin: 0;
   padding: 5px 4px;
@@ -2052,12 +2047,15 @@ body {
   overflow-wrap: anywhere;
 }
 
+/* 文章入力欄をカードの幅いっぱいにする */
 #textControls label {
-  grid-column: 1 / -1;
+  display: block;
+  margin: 2px 0;
 }
 
 #textControls #textInput {
-  grid-column: 1 / -1;
   width: 100%;
   min-width: 0;
+  height: 48px;
+  min-height: 48px;
 }
