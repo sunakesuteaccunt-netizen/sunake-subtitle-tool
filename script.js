@@ -2056,3 +2056,130 @@ layers.push(firstLayer);
 selectLayer(firstLayer.id);
 updatePlaybackDisplay();
 showStatus("準備完了！レイヤーに文章を追加できます。");
+
+/* ========================================
+   数値調整用の矢印ボタン
+======================================== */
+
+// 開始時間・終了時間を0.2秒ずつ調整
+function adjustLayerTime(field, direction) {
+  const layer = getSelectedLayer();
+
+  if (!layer) {
+    showStatus("先にレイヤーを選択してください。");
+    return;
+  }
+
+  const step = 0.2;
+  const oldStart = Number(layer.start);
+  const oldEnd = Number(layer.end);
+
+  let newStart = oldStart;
+  let newEnd = oldEnd;
+
+  if (field === "start") {
+    newStart = Math.max(
+      0,
+      Math.round((oldStart + step * direction) * 1000) / 1000
+    );
+
+    if (newStart >= oldEnd) {
+      showStatus("開始時間は終了時間より前に設定してください。");
+      return;
+    }
+  } else {
+    newEnd = Math.round(
+      (oldEnd + step * direction) * 1000
+    ) / 1000;
+
+    if (newEnd <= oldStart) {
+      showStatus("終了時間は開始時間より後に設定してください。");
+      return;
+    }
+  }
+
+  // 値が変わらない場合は履歴を作らない
+  if (newStart === oldStart && newEnd === oldEnd) {
+    return;
+  }
+
+  // 変更前の状態を履歴に保存
+  recordHistory();
+
+  layer.start = newStart;
+  layer.end = newEnd;
+
+  startTime.value = String(newStart);
+  endTime.value = String(newEnd);
+
+  // 既存の表示更新処理
+  layers.sort((a, b) => a.start - b.start || a.id - b.id);
+  renderLayerList();
+  updateLayerNavigationButtons();
+  renderPlaybackFrame();
+
+  showStatus(
+    field === "start"
+      ? "開始時間を0.2秒調整しました。"
+      : "終了時間を0.2秒調整しました。"
+  );
+}
+
+
+// 選択中の文章の位置を1％ずつ調整
+function adjustTextPosition(axis, direction) {
+  const text = getSelectedText();
+
+  if (!text) {
+    showStatus("先に位置を変更する文章を選択してください。");
+    return;
+  }
+
+  const property = axis === "x" ? "x" : "y";
+  const current = Number(text[property]);
+  const next = clamp(current + direction, 0, 100);
+
+  // 0％・100％の範囲外には動かさない
+  if (next === current) {
+    return;
+  }
+
+  // 変更前の状態を履歴に保存
+  recordHistory();
+
+  text[property] = next;
+
+  positionX.value = text.x;
+  positionY.value = text.y;
+
+  // プレビューに即時反映
+  renderPreview();
+
+  showStatus(
+    axis === "x"
+      ? "横位置を1％調整しました。"
+      : "縦位置を1％調整しました。"
+  );
+}
+
+
+// 矢印ボタンのイベント登録
+const arrowButtonHandlers = [
+  ["startTimeDownButton", () => adjustLayerTime("start", -1)],
+  ["startTimeUpButton", () => adjustLayerTime("start", 1)],
+  ["endTimeDownButton", () => adjustLayerTime("end", -1)],
+  ["endTimeUpButton", () => adjustLayerTime("end", 1)],
+
+  ["positionXDownButton", () => adjustTextPosition("x", -1)],
+  ["positionXUpButton", () => adjustTextPosition("x", 1)],
+  ["positionYDownButton", () => adjustTextPosition("y", -1)],
+  ["positionYUpButton", () => adjustTextPosition("y", 1)]
+];
+
+arrowButtonHandlers.forEach(([id, handler]) => {
+  const button = $(id);
+
+  if (button) {
+    button.addEventListener("click", handler);
+  }
+});
