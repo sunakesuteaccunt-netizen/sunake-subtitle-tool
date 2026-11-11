@@ -77,8 +77,9 @@ function updateHistoryButtons() {
   redoButton.disabled = redoStack.length === 0;
 }
 
-function recordHistory() {
-  undoStack.push(createHistorySnapshot());
+
+function recordHistorySnapshot(snapshot) {
+  undoStack.push(snapshot);
 
   if (undoStack.length > HISTORY_LIMIT) {
     undoStack.shift();
@@ -88,6 +89,10 @@ function recordHistory() {
   redoStack.length = 0;
 
   updateHistoryButtons();
+}
+
+function recordHistory() {
+  recordHistorySnapshot(createHistorySnapshot());
 }
 
 function restoreHistorySnapshot(snapshot) {
