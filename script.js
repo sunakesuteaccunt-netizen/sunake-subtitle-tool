@@ -1324,14 +1324,18 @@ function updateSelectedTextControls() {
   fontColor.value = text.color.toLowerCase();
   fontColorValue.textContent = text.color;
 }
+
 function applyPosition() {
   const text = getSelectedText();
+
   if (!text) {
     showStatus("位置を変更する文章を選択してください。");
     return;
   }
+
   const x = Number(positionX.value);
   const y = Number(positionY.value);
+
   if (
     positionX.value.trim() === "" ||
     positionY.value.trim() === "" ||
@@ -1341,9 +1345,26 @@ function applyPosition() {
     showStatus("横位置と縦位置を数値で入力してください。");
     return;
   }
-  text.x = clamp(x, 0, 100);
-  text.y = clamp(y, 0, 100);
+
+  // 位置を整数（1.0％単位）に統一
+  const newX = clamp(Math.round(x), 0, 100);
+  const newY = clamp(Math.round(y), 0, 100);
+
+  if (newX === text.x && newY === text.y) {
+    showStatus("位置に変更はありません。");
+    return;
+  }
+
+  recordHistory();
+
+  text.x = newX;
+  text.y = newY;
+
+  positionX.value = newX;
+  positionY.value = newY;
+
   renderPreview();
+
   showStatus("文章の位置を反映しました。");
 }
 function applyFontSize() {
