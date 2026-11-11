@@ -2153,6 +2153,7 @@ function adjustLayerTime(field, direction) {
 
 
 // 選択中の文章の位置を1％ずつ調整
+
 function adjustTextPosition(axis, direction) {
   const text = getSelectedText();
 
@@ -2162,15 +2163,15 @@ function adjustTextPosition(axis, direction) {
   }
 
   const property = axis === "x" ? "x" : "y";
-  const current = Number(text[property]);
+
+  // 整数に統一してから1％ずつ調整
+  const current = Math.round(Number(text[property]));
   const next = clamp(current + direction, 0, 100);
 
-  // 0％・100％の範囲外には動かさない
-  if (next === current) {
+  if (next === current && next === text[property]) {
     return;
   }
 
-  // 変更前の状態を履歴に保存
   recordHistory();
 
   text[property] = next;
@@ -2178,15 +2179,15 @@ function adjustTextPosition(axis, direction) {
   positionX.value = text.x;
   positionY.value = text.y;
 
-  // プレビューに即時反映
   renderPreview();
 
   showStatus(
     axis === "x"
-      ? "横位置を1％調整しました。"
-      : "縦位置を1％調整しました。"
+      ? "横位置を1.0％調整しました。"
+      : "縦位置を1.0％調整しました。"
   );
 }
+
 
 
 // 矢印ボタンのイベント登録
