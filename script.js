@@ -1443,69 +1443,132 @@ function renderPreview(visibleLayers = null) {
     ? "字幕が表示される時間になると、ここに表示されます"
     : "字幕の配置プレビュー";
 }
+
 function enableDragging(element, layer, text) {
   let dragging = false;
   let pointerId = null;
+
   let startPointerX = 0;
   let startPointerY = 0;
+
   let startTextX = 0;
   let startTextY = 0;
+
+  // ドラッグ開始前の位置と履歴を保存
+  let originalTextX = 0;
+  let originalTextY = 0;
+  let dragStartSnapshot = null;
+
   element.addEventListener("pointerdown", event => {
     if (isPlaying) return;
+
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
     event.preventDefault();
+
     if (layer.id !== selectedLayerId) {
       selectLayer(layer.id);
       return;
     }
+
+    // ドラッグする文章を選択
     selectText(text.id);
+
     dragging = true;
     pointerId = event.pointerId;
+
     startPointerX = event.clientX;
     startPointerY = event.clientY;
-    startTextX = text.x;
-    startTextY = text.y;
+
+    // 変更前の位置を保存
+    originalTextX = Number(text.x);
+    originalTextY = Number(text.y);
+
+    // ドラッグの基準位置を整数に統一
+    startTextX = Math.round(originalTextX);
+    startTextY = Math.round(originalTextY);
+
+    // ドラッグ開始前の状態を保存
+    dragStartSnapshot = createHistorySnapshot();
+
     if (element.setPointerCapture) {
-      element.setPointerCapture(pointerId);
+      try {
+        element.setPointerCapture(pointerId);
+      } catch (error) {
+        // 捕捉に失敗しても処理を続ける
+      }
     }
   });
+
   element.addEventListener("pointermove", event => {
     if (!dragging || event.pointerId !== pointerId) return;
+
     event.preventDefault();
+
     const rect = preview.getBoundingClientRect();
+
     if (!rect.width || !rect.height) return;
+
+    // 指・マウスの移動量を％に変換
+    const deltaX =
+      ((event.clientX - startPointerX) / rect.width) * 100;
+
+    const deltaY =
+      ((event.clientY - startPointerY) / rect.height) * 100;
+
+    // 位置を1.0％単位に丸める
     text.x = clamp(
-      startTextX + ((event.clientX - startPointerX) / rect.width) * 100,
-      0, 100
+      Math.round(startTextX + deltaX),
+      0,
+      100
     );
+
     text.y = clamp(
-      startTextY + ((event.clientY - startPointerY) / rect.height) * 100,
-      0, 100
+      Math.round(startTextY + deltaY),
+      0,
+      100
     );
+
+    // プレビューに即時反映
     element.style.left = `${text.x}%`;
     element.style.top = `${text.y}%`;
-    positionX.value = text.x.toFixed(1);
-    positionY.value = text.y.toFixed(1);
+
+    // 数値入力欄にも反映
+    positionX.value = text.x;
+    positionY.value = text.y;
   });
+
   function finishDragging(event) {
     if (!dragging || event.pointerId !== pointerId) return;
+
     dragging = false;
     pointerId = null;
-    text.x = Math.round(text.x * 10) / 10;
-    text.y = Math.round(text.y * 10) / 10;
-    element.style.left = `${text.x}%`;
-    element.style.top = `${text.y}%`;
-    positionX.value = text.x.toFixed(1);
-    positionY.value = text.y.toFixed(1);
-    renderTextList();
+
+    // 変更があった場合だけ履歴に登録
+    const changed =
+      text.x !== originalTextX ||
+      text.y !== originalTextY;
+
+    if (changed && dragStartSnapshot) {
+      recordHistorySnapshot(dragStartSnapshot);
+
+      showStatus("プレビュー上で文章の位置を変更しました。");
+    }
+
+    dragStartSnapshot = null;
+
+    // 表示と入力欄を同期
+    renderPreview();
     updateSelectedTextControls();
   }
+
   element.addEventListener("pointerup", finishDragging);
   element.addEventListener("pointercancel", finishDragging);
-  element.addEventListener("lostpointercapture", () => {
-    dragging = false;
-    pointerId = null;
-  });
+  element.addEventListener("lostpointercapture", finishDragging);
 }
+
 /* ========================================
    再生と字幕同期
 ======================================== */
