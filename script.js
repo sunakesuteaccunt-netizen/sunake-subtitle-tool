@@ -937,19 +937,32 @@ function duplicateText(textId) {
 }
 
 
+
 function deleteSelectedText() {
   const layer = getSelectedLayer();
+
   if (!layer || selectedTextId === null) {
     showStatus("削除する文章を選択してください。");
     return;
   }
-  layer.texts = layer.texts.filter(text => text.id !== selectedTextId);
+
+  // 削除前の状態を履歴に保存
+  recordHistory();
+
+  // 選択中の文章を削除
+  layer.texts = layer.texts.filter(
+    text => text.id !== selectedTextId
+  );
+
   selectedTextId = null;
+
   renderTextList();
   renderPreview();
   updateSelectedTextControls();
+
   showStatus("文章を削除しました。");
 }
+
 
 function renderTextList() {
   textList.replaceChildren();
