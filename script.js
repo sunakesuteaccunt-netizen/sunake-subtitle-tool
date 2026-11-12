@@ -860,7 +860,6 @@ function addText() {
   layer.texts.push(text);
   selectedTextId = text.id;
   textInput.value = "";
-  $("applyTextButton").disabled = false;
   renderTextList();
   renderPreview();
   updateSelectedTextControls();
