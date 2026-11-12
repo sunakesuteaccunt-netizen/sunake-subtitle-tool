@@ -1348,6 +1348,7 @@ function updateSelectedTextControls() {
   fontColorValue.textContent = text.color;
 
   updateApplyTextButton();
+  updateApplyFontSizeButton();
 }
 
 
