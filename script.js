@@ -1385,7 +1385,8 @@ function updateApplyFontSizeButton() {
     newColor === normalizeColor(text.color);
 }
 textInput.addEventListener("input", updateApplyTextButton);
-
+fontSize.addEventListener("input", updateApplyFontSizeButton);
+fontColor.addEventListener("input", updateApplyFontSizeButton);
 function applyPosition() {
   const text = getSelectedText();
 
