@@ -845,6 +845,7 @@ function applyLayerTime() {
    文章の追加・複製・削除
 ======================================== */
 
+
 function addText() {
   const layer = getSelectedLayer();
 
