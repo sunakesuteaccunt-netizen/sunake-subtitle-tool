@@ -894,25 +894,32 @@ function applyText() {
   updateSelectedTextControls();
   showStatus("文章を反映しました。");
 }
+
 function duplicateText(textId) {
   const layer = getSelectedLayer();
   if (!layer) return;
+
   const original = layer.texts.find(text => text.id === textId);
   if (!original) return;
+
   const copied = createText(
     original.text,
-    clamp(original.x + 3, 0, 100),
-    clamp(original.y + 3, 0, 100),
+    original.x,
+    original.y,
     original.fontSize,
     original.color
   );
+
   layer.texts.push(copied);
   selectedTextId = copied.id;
+
   renderTextList();
   renderPreview();
   updateSelectedTextControls();
+
   showStatus("文章を複製しました。");
 }
+
 function deleteSelectedText() {
   const layer = getSelectedLayer();
   if (!layer || selectedTextId === null) {
