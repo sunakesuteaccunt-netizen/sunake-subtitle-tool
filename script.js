@@ -1314,13 +1314,12 @@ function selectText(textId, options = {}) {
 
 function updateSelectedTextControls() {
   const text = getSelectedText();
+
   if (!text) {
     selectedTextName.textContent = "文章が選択されていません";
     $("applyTextButton").disabled = true;
     return;
   }
-
-  $("applyTextButton").disabled = false;
 
   text.color = normalizeColor(text.color);
   selectedTextName.textContent = text.text;
@@ -1330,6 +1329,18 @@ function updateSelectedTextControls() {
   fontSize.value = text.fontSize;
   fontColor.value = text.color.toLowerCase();
   fontColorValue.textContent = text.color;
+
+  updateApplyTextButton();
+}
+
+
+function updateApplyTextButton() {
+  const text = getSelectedText();
+
+  $("applyTextButton").disabled =
+    !text ||
+    !textInput.value.trim() ||
+    textInput.value.trim() === text.text;
 }
 
 function applyPosition() {
