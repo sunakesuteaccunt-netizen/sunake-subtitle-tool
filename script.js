@@ -844,27 +844,38 @@ function applyLayerTime() {
 /* ========================================
    文章の追加・複製・削除
 ======================================== */
+
 function addText() {
   const layer = getSelectedLayer();
+
   if (!layer) {
     showStatus("先にレイヤーを追加または選択してください。");
     return;
   }
+
   const value = textInput.value.trim();
+
   if (!value) {
     showStatus("文章を入力してください。");
     return;
   }
 
+  // 追加前の状態を履歴に記録
+  recordHistory();
+
   const text = createText(value);
   layer.texts.push(text);
   selectedTextId = text.id;
+
   textInput.value = "";
+
   renderTextList();
   renderPreview();
   updateSelectedTextControls();
+
   showStatus("文章を追加しました。");
 }
+
 function applyText() {
   const text = getSelectedText();
 
