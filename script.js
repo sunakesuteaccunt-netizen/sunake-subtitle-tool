@@ -1404,23 +1404,51 @@ function applyPosition() {
 
   showStatus("文章の位置を反映しました。");
 }
+
 function applyFontSize() {
   const text = getSelectedText();
+
   if (!text) {
     showStatus("設定を変更する文章を選択してください。");
     return;
   }
+
   const size = Number(fontSize.value);
-  if (fontSize.value.trim() === "" || !Number.isFinite(size)) {
+
+  if (
+    fontSize.value.trim() === "" ||
+    !Number.isFinite(size)
+  ) {
     showStatus("文字サイズを数値で入力してください。");
     return;
   }
-  text.fontSize = clamp(size, 25, 300);
-  text.color = normalizeColor(fontColor.value);
+
+  // 反映する新しい設定を取得
+  const newSize = clamp(size, 25, 300);
+  const newColor = normalizeColor(fontColor.value);
+
+  // 変更がない場合は履歴に記録しない
+  if (
+    newSize === text.fontSize &&
+    newColor === normalizeColor(text.color)
+  ) {
+    showStatus("色・大きさに変更はありません。");
+    return;
+  }
+
+  // 変更前の状態を履歴に記録
+  recordHistory();
+
+  // 新しい設定を反映
+  text.fontSize = newSize;
+  text.color = newColor;
+
   renderPreview();
   updateSelectedTextControls();
+
   showStatus("文字サイズと文字色を反映しました。");
 }
+
 fontColor.addEventListener("input", () => {
   fontColorValue.textContent = normalizeColor(fontColor.value);
 });
