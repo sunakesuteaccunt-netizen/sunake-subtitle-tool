@@ -907,6 +907,7 @@ function applyText() {
 }
 
 
+
 function duplicateText(textId) {
   const layer = getSelectedLayer();
   if (!layer) return;
