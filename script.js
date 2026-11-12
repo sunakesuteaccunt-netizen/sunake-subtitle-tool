@@ -1343,6 +1343,8 @@ function updateApplyTextButton() {
     textInput.value.trim() === text.text;
 }
 
+textInput.addEventListener("input", updateApplyTextButton);
+
 function applyPosition() {
   const text = getSelectedText();
 
