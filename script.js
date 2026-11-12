@@ -905,12 +905,16 @@ function applyText() {
   showStatus("文章を反映しました。");
 }
 
+
 function duplicateText(textId) {
   const layer = getSelectedLayer();
   if (!layer) return;
 
   const original = layer.texts.find(text => text.id === textId);
   if (!original) return;
+
+  // 複製前の状態を履歴に記録
+  recordHistory();
 
   const copied = createText(
     original.text,
@@ -929,6 +933,7 @@ function duplicateText(textId) {
 
   showStatus("文章を複製しました。");
 }
+
 
 function deleteSelectedText() {
   const layer = getSelectedLayer();
