@@ -1359,7 +1359,31 @@ function updateApplyTextButton() {
     !textInput.value.trim() ||
     textInput.value.trim() === text.text;
 }
+function updateApplyFontSizeButton() {
+  const text = getSelectedText();
+  const rawSize = fontSize.value.trim();
+  const size = Number(rawSize);
 
+  const button = $("applyFontSizeButton");
+
+  // 文章が未選択、またはサイズが不正なら無効
+  if (
+    !text ||
+    rawSize === "" ||
+    !Number.isFinite(size)
+  ) {
+    button.disabled = true;
+    return;
+  }
+
+  const newSize = clamp(size, 25, 300);
+  const newColor = normalizeColor(fontColor.value);
+
+  // 色・大きさのどちらにも変更がなければ無効
+  button.disabled =
+    newSize === text.fontSize &&
+    newColor === normalizeColor(text.color);
+}
 textInput.addEventListener("input", updateApplyTextButton);
 
 function applyPosition() {
